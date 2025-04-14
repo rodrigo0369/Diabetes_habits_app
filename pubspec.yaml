@@ -1,0 +1,22 @@
+name: diabetes_habits_app
+description: Una aplicación para el manejo de la diabetes, incluyendo registro de hábitos, glucosa, y configuraciones personalizadas.
+publish_to: 'none' # Evita la publicación a pub.dev por ahora
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0" # Asegúrate de usar una versión compatible del SDK
+
+dependencies:
+  flutter:
+    sdk: flutter
+  shared_preferences: ^2.2.2 # O la versión más reciente disponible
+  intl: ^0.18.0 # Para formateo de fechas y números (opcional, pero útil)
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
