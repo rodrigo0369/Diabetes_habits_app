@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../services/storage_service.dart'; // Importa el servicio
+import '../services/storage_service.dart';
+import '../services/notification_service.dart'; // Importa el servicio de notificaciones
 
 class ConfiguracionScreen extends StatefulWidget {
   @override
@@ -29,6 +30,7 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
           ? TimeOfDay.fromDateTime(DateFormat('hh:mm a').parse(timeString))
           : TimeOfDay.now();
     });
+    _scheduleGlucosaReminderNotification(); // Programa la notificación al cargar
   }
 
   Future<void> _saveConfiguracion() async {
@@ -36,6 +38,26 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
     await StorageService.saveCountry(_selectedCountry);
     await StorageService.saveDiabetesType(_selectedDiabetesType);
     await StorageService.saveGlucosaReminderTime(_glucosaReminderTime.format(context));
+    _scheduleGlucosaReminderNotification(); //  Re-programa la notificación al guardar
+  }
+
+  Future<void> _scheduleGlucosaReminderNotification() async {
+    final now = DateTime.now();
+    final scheduledTime = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      _glucosaReminderTime.hour,
+      _glucosaReminderTime.minute,
+    );
+    if (scheduledTime.isAfter(now)) {
+      await NotificationService.scheduleNotification(
+        id: 999, //  ID único para la notificación de glucosa
+        title: 'Recordatorio de Glucosa',
+        body: '¡Es hora de registrar tu nivel de glucosa!',
+        scheduledDate: scheduledTime,
+      );
+    }
   }
 
   @override
