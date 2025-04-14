@@ -12,13 +12,9 @@ dependencies:
     sdk: flutter
   shared_preferences: ^2.2.2 # O la versión más reciente disponible
   intl: ^0.18.0 # Para formateo de fechas y números (opcional, pero útil)
-  
   flutter_local_notifications: ^16.3.2
+  flutter_localization: ^1.1.0 #  Asegúrate de usar la versión más reciente de pub.dev
 
-  flutter_localization:
-    sdk: flutter
-  flutter_localizations:
-    sdk: flutter
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -26,5 +22,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-assets:
-       assets/i18n/
+  assets:
+    - assets/i18n/
