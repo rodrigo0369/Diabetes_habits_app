@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 import 'screens/glucosa_screen.dart';
 import 'screens/configuracion_screen.dart';
-import 'services/storage_service.dart'; // Importa el servicio de almacenamiento
+import 'screens/recommendations_screen.dart'; // Importa la nueva pantalla
+import 'services/storage_service.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // Asegura que Flutter esté inicializado
-  await StorageService.init(); // Inicializa SharedPreferences
+  WidgetsFlutterBinding.ensureInitialized();
+  await StorageService.init();
   runApp(MyApp());
 }
 
@@ -19,6 +20,9 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: MainScreen(),
+      routes: {
+        '/recommendations': (context) => RecommendationsScreen(), // Define la ruta
+      },
     );
   }
 }
@@ -58,12 +62,99 @@ class _MainScreenState extends State<MainScreen> {
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
       ),
+      floatingActionButton: _selectedIndex == 0 // Mostrar solo en la pantalla de Hábitos
+          ? FloatingActionButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AddHabitDialog(onHabitAdded: _addHabit),
+                );
+              },
+              child: Icon(Icons.add),
+            )
+          : null,
     );
   }
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      if (index == 2) {
+        // Si se selecciona Configuración, navega a Recomendaciones
+        Navigator.pushNamed(context, '/recommendations');
+      }
     });
+  }
+
+  void _addHabit(Habit habit) {
+    setState(() {
+      _habits.add(habit);
+    });
+    _saveHabits();
+  }
+
+  void _toggleHabit(Habit habit) {
+    setState(() {
+      habit.isCompleted = !habit.isCompleted;
+    });
+    _saveHabits();
+  }
+
+  void _editHabit(Habit oldHabit, Habit newHabit) {
+    setState(() {
+      final index = _habits.indexOf(oldHabit);
+      if (index != -1) {
+        _habits[index] = newHabit;
+      }
+    });
+    _saveHabits();
+  }
+
+  void _deleteHabit(Habit habit) {
+    setState(() {
+      _habits.remove(habit);
+    });
+    _saveHabits();
+  }
+
+  List<Habit> _habits = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadHabits();
+  }
+
+  Future<void> _loadHabits() async {
+    final List<Map<String, dynamic>> encodedHabits = StorageService.getHabits();
+    setState(() {
+      _habits = encodedHabits.map((habit) => Habit.fromJson(habit)).toList();
+    });
+  }
+
+  Future<void> _saveHabits() async {
+    final List<Map<String, dynamic>> encodedHabits =
+        _habits.map((habit) => habit.toJson()).toList();
+    await StorageService.saveHabits(encodedHabits);
+  }
+}
+
+extension HabitPersistence on Habit {
+  Map<String, dynamic> toJson() {
+    return {
+      'title': title,
+      'reminderTime': reminderTime?.toIso8601String(),
+      'isCompleted': isCompleted,
+    };
+  }
+
+  static Habit fromJson(Map<String, dynamic> json) {
+    return Habit(
+      title: json['title'],
+      reminderTime: json['reminderTime'] != null
+          ? DateTime.parse(json['reminderTime'])
+          : null,
+      isCompleted: json['isCompleted'],
+    );
   }
 }
