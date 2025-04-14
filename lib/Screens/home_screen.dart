@@ -3,6 +3,7 @@ import '../models/habit.dart';
 import '../widgets/habit_list.dart';
 import '../widgets/habit_counter.dart';
 import '../widgets/add_habit_dialog.dart';
+import '../services/storage_service.dart'; // Importa el servicio
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -15,21 +16,34 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Cargar hábitos guardados (si los hay)
+    _loadHabits();
+  }
+
+  Future<void> _loadHabits() async {
+    final List<Map<String, dynamic>> encodedHabits = StorageService.getHabits();
+    setState(() {
+      _habits = encodedHabits.map((habit) => Habit.fromJson(habit)).toList();
+    });
+  }
+
+  Future<void> _saveHabits() async {
+    final List<Map<String, dynamic>> encodedHabits =
+        _habits.map((habit) => habit.toJson()).toList();
+    await StorageService.saveHabits(encodedHabits);
   }
 
   void _addHabit(Habit habit) {
     setState(() {
       _habits.add(habit);
-      // Guardar el hábito
     });
+    _saveHabits();
   }
 
   void _toggleHabit(Habit habit) {
     setState(() {
       habit.isCompleted = !habit.isCompleted;
-      // Actualizar el hábito guardado
     });
+    _saveHabits();
   }
 
   void _editHabit(Habit oldHabit, Habit newHabit) {
@@ -37,16 +51,16 @@ class _HomeScreenState extends State<HomeScreen> {
       final index = _habits.indexOf(oldHabit);
       if (index != -1) {
         _habits[index] = newHabit;
-        // Actualizar el hábito guardado
       }
     });
+    _saveHabits();
   }
 
   void _deleteHabit(Habit habit) {
     setState(() {
       _habits.remove(habit);
-      // Eliminar el hábito guardado
     });
+    _saveHabits();
   }
 
   @override
@@ -64,8 +78,8 @@ class _HomeScreenState extends State<HomeScreen> {
             child: HabitList(
               habits: _habits,
               onHabitToggled: _toggleHabit,
-              onHabitEdited: _editHabit, // Pasa la función para editar
-              onHabitDeleted: _deleteHabit, // Pasa la función para eliminar
+              onHabitEdited: _editHabit,
+              onHabitDeleted: _deleteHabit,
             ),
           ),
         ],
@@ -79,6 +93,27 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         child: Icon(Icons.add),
       ),
+    );
+  }
+}
+
+// Añade estos métodos a la clase Habit
+extension HabitPersistence on Habit {
+  Map<String, dynamic> toJson() {
+    return {
+      'title': title,
+      'reminderTime': reminderTime?.toIso8601String(),
+      'isCompleted': isCompleted,
+    };
+  }
+
+  static Habit fromJson(Map<String, dynamic> json) {
+    return Habit(
+      title: json['title'],
+      reminderTime: json['reminderTime'] != null
+          ? DateTime.parse(json['reminderTime'])
+          : null,
+      isCompleted: json['isCompleted'],
     );
   }
 }
