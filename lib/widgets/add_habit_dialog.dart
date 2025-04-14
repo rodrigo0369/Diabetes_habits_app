@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/habit.dart';
+import '../l10n/app_localizations.dart'; // Importa
 
 class AddHabitDialog extends StatefulWidget {
   final Function(Habit) onHabitAdded;
@@ -17,18 +18,20 @@ class _AddHabitDialogState extends State<AddHabitDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context); // Obtén la instancia
+
     return AlertDialog(
-      title: Text('Agregar Hábito'),
+      title: Text(localizations!.translate('add_habit')), // Usa la traducción
       content: Form(
         key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextFormField(
-              decoration: InputDecoration(labelText: 'Título'),
+              decoration: InputDecoration(labelText: localizations.translate('title')), // Usa la traducción
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Por favor, ingresa un título';
+                  return localizations.translate('please_enter_title'); // Usa la traducción
                 }
                 return null;
               },
@@ -39,8 +42,8 @@ class _AddHabitDialogState extends State<AddHabitDialog> {
             ListTile(
               title: Text(
                 _reminderTime == null
-                    ? 'Seleccionar Recordatorio'
-                    : 'Recordatorio: ${_reminderTime!.format(context)}',
+                    ? localizations.translate('select_reminder') // Usa la traducción
+                    : '${localizations.translate('reminder')}: ${_reminderTime!.format(context)}', // Usa la traducción
               ),
               trailing: Icon(Icons.alarm_add),
               onTap: () async {
@@ -63,7 +66,7 @@ class _AddHabitDialogState extends State<AddHabitDialog> {
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: Text('Cancelar'),
+          child: Text(localizations.translate('cancel')), // Usa la traducción
         ),
         TextButton(
           onPressed: () {
@@ -74,7 +77,7 @@ class _AddHabitDialogState extends State<AddHabitDialog> {
               Navigator.of(context).pop();
             }
           },
-          child: Text('Guardar'),
+          child: Text(localizations.translate('save')), // Usa la traducción
         ),
       ],
     );
