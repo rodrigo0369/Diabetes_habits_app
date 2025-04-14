@@ -12,9 +12,9 @@ dependencies:
     sdk: flutter
   shared_preferences: ^2.2.2 # O la versión más reciente disponible
   intl: ^0.18.0 # Para formateo de fechas y números (opcional, pero útil)
-  dependencies:
+  
   flutter_local_notifications: ^16.3.2
-dependencies:
+
   flutter_localization:
     sdk: flutter
   intl: ^0.18.0 #  Ya lo tenemos, pero asegúrate de que esté
