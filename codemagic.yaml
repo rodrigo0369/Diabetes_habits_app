@@ -1,0 +1,29 @@
+workflows:
+  android-build:
+    name: Build Android
+    instance_type: mac_medium
+    max_build_duration: 60
+    environment:
+      flutter_version: 3.16.0 #  Asegúrate de usar la versión correcta
+      ANDROID_GRADLE_JVM_ARGS: "-Xmx4096m" #  Aumenta la memoria para Gradle (útil si hay errores de memoria)
+    scripts:
+      - name: Flutter clean
+        script: flutter clean
+      - name: Flutter pub get
+        script: flutter pub get
+      - name: Flutter analyze
+        script: flutter analyze
+      - name: Flutter test
+        script: flutter test
+      - name: Flutter build apk
+        script: flutter build apk
+    artifacts:
+      - build/app/outputs/flutter-apk/*.apk
+    publishing:
+      #  Descomenta esta sección y configura para publicar en Google Play Store
+      #  Si deseas automatizar la publicación
+      #  google_play:
+      #    credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS #  Variable de entorno con las credenciales
+      #    package_name: com.ejemplo.appparadiabeticos #  El nombre del paquete de tu app
+      #    release_track: production #  O 'beta', 'alpha', etc.
+      #    submit_to_play_store: true
