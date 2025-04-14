@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 import 'screens/glucosa_screen.dart';
-import 'screens/configuracion_screen.dart'; // Importa la pantalla de configuración
+import 'screens/configuracion_screen.dart';
+import 'services/storage_service.dart'; // Importa el servicio de almacenamiento
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // Asegura que Flutter esté inicializado
+  await StorageService.init(); // Inicializa SharedPreferences
   runApp(MyApp());
 }
 
@@ -15,7 +18,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MainScreen(), // Usa la nueva pantalla principal con navegación
+      home: MainScreen(),
     );
   }
 }
@@ -30,7 +33,7 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> _screens = [
     HomeScreen(),
     GlucosaScreen(),
-    ConfiguracionScreen(), // Añade la pantalla de configuración
+    ConfiguracionScreen(),
   ];
 
   @override
