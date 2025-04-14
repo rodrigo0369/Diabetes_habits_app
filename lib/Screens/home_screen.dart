@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../models/habit.dart'; // Asegúrate de crear este modelo
-import '../widgets/habit_list.dart'; // Y este widget
+import '../models/habit.dart';
+import '../widgets/habit_list.dart';
 import '../widgets/habit_counter.dart';
 import '../widgets/add_habit_dialog.dart';
 
@@ -32,6 +32,23 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void _editHabit(Habit oldHabit, Habit newHabit) {
+    setState(() {
+      final index = _habits.indexOf(oldHabit);
+      if (index != -1) {
+        _habits[index] = newHabit;
+        // Actualizar el hábito guardado
+      }
+    });
+  }
+
+  void _deleteHabit(Habit habit) {
+    setState(() {
+      _habits.remove(habit);
+      // Eliminar el hábito guardado
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     int _completedHabitsCount = _habits.where((habit) => habit.isCompleted).length;
@@ -47,6 +64,8 @@ class _HomeScreenState extends State<HomeScreen> {
             child: HabitList(
               habits: _habits,
               onHabitToggled: _toggleHabit,
+              onHabitEdited: _editHabit, // Pasa la función para editar
+              onHabitDeleted: _deleteHabit, // Pasa la función para eliminar
             ),
           ),
         ],
