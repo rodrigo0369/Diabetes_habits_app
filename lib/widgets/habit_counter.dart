@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart'; // Importa
 
 class HabitCounter extends StatelessWidget {
   final int count;
@@ -7,9 +8,11 @@ class HabitCounter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context); // Obtén la instancia
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Text('Hábitos completados hoy: $count'),
+      child: Text('${localizations!.translate('habits_completed_today')}: $count'), // Usa la traducción
     );
   }
 }
