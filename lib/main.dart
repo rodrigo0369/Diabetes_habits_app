@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 import 'screens/glucosa_screen.dart';
 import 'screens/configuracion_screen.dart';
-import 'screens/recommendations_screen.dart'; // Importa la nueva pantalla
+import 'screens/recommendations_screen.dart'; 
 import 'services/storage_service.dart';
+import 'services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await StorageService.init();
+  await NotificationService.initialize(); 
   runApp(MyApp());
 }
 
@@ -21,7 +23,7 @@ class MyApp extends StatelessWidget {
       ),
       home: MainScreen(),
       routes: {
-        '/recommendations': (context) => RecommendationsScreen(), // Define la ruta
+        '/recommendations': (context) => RecommendationsScreen(),
       },
     );
   }
@@ -62,7 +64,7 @@ class _MainScreenState extends State<MainScreen> {
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
       ),
-      floatingActionButton: _selectedIndex == 0 // Mostrar solo en la pantalla de Hábitos
+      floatingActionButton: _selectedIndex == 0 
           ? FloatingActionButton(
               onPressed: () {
                 showDialog(
