@@ -1,0 +1,109 @@
+import 'package:flutter/material.dart';
+
+class ConfiguracionScreen extends StatefulWidget {
+  @override
+  _ConfiguracionScreenState createState() => _ConfiguracionScreenState();
+}
+
+class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
+  String _selectedLanguage = 'Español'; // Valor por defecto
+  String _selectedCountry = 'Argentina'; // Valor por defecto
+  String _selectedDiabetesType = 'Tipo 2'; // Valor por defecto
+  TimeOfDay _glucosaReminderTime = TimeOfDay.now();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Configuración'),
+      ),
+      body: ListView(
+        padding: EdgeInsets.all(16.0),
+        children: [
+          // Selección de Idioma
+          ListTile(
+            title: Text('Idioma'),
+            trailing: DropdownButton<String>(
+              value: _selectedLanguage,
+              items: <String>['Español', 'Inglés'].map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedLanguage = newValue!;
+                });
+              },
+            ),
+          ),
+          // Selección de País
+          ListTile(
+            title: Text('País'),
+            trailing: DropdownButton<String>(
+              value: _selectedCountry,
+              items: <String>['Argentina', 'México', 'España'].map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedCountry = newValue!;
+                });
+              },
+            ),
+          ),
+          // Selección de Tipo de Diabetes
+          ListTile(
+            title: Text('Tipo de Diabetes'),
+            trailing: DropdownButton<String>(
+              value: _selectedDiabetesType,
+              items: <String>['Tipo 1', 'Tipo 2', 'Gestacional'].map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedDiabetesType = newValue!;
+                });
+              },
+            ),
+          ),
+          // Hora de Recordatorio de Glucosa
+          ListTile(
+            title: Text('Hora Recordatorio Glucosa'),
+            subtitle: Text(_glucosaReminderTime.format(context)),
+            trailing: Icon(Icons.alarm),
+            onTap: () async {
+              final selectedTime = await showTimePicker(
+                context: context,
+                initialTime: _glucosaReminderTime,
+              );
+              if (selectedTime != null) {
+                setState(() {
+                  _glucosaReminderTime = selectedTime;
+                });
+              }
+            },
+          ),
+          // Botón Guardar
+          ElevatedButton(
+            onPressed: () {
+              // Guardar las configuraciones
+              // Puedes usar SharedPreferences para esto
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Configuración guardada')),
+              );
+            },
+            child: Text('Guardar'),
+          ),
+        ],
+      ),
+    );
+  }
+}
