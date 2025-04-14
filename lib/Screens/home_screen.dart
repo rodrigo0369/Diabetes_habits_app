@@ -3,7 +3,9 @@ import '../models/habit.dart';
 import '../widgets/habit_list.dart';
 import '../widgets/habit_counter.dart';
 import '../widgets/add_habit_dialog.dart';
-import '../services/storage_service.dart'; // Importa el servicio
+import '../services/storage_service.dart';
+import '../services/notification_service.dart';
+import '../l10n/app_localizations.dart'; // Importa
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -11,89 +13,42 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<Habit> _habits = [];
+  // ... (Código anterior sin cambios importantes)
 
-@override
-void initState() {
-  super.initState();
-  _loadHabits();
-  _scheduleHabitNotifications(); //  Programa las notificaciones
-}
+  @override
+  Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context); // Obtén la instancia
 
-Future<void> _scheduleHabitNotifications() async {
-  for (var habit in _habits) {
-    if (habit.reminderTime != null) {
-      final now = DateTime.now();
-      final scheduledTime = DateTime(
-        now.year,
-        now.month,
-        now.day,
-        habit.reminderTime!.hour,
-        habit.reminderTime!.minute,
-      );
-      if (scheduledTime.isAfter(now)) {
-        NotificationService.scheduleNotification(
-          id: _habits.indexOf(habit), //  Usa el índice como ID (¡Cuidado con los duplicados!)
-          title: 'Recordatorio de Hábito',
-          body: '¡No olvides: ${habit.title}!',
-          scheduledDate: scheduledTime,
-        );
-      }
-    }
-  }
-}
+    int _completedHabitsCount = _habits.where((habit) => habit.isCompleted).length;
 
-void _addHabit(Habit habit) {
-  setState(() {
-    _habits.add(habit);
-  });
-  _saveHabits();
-  if (habit.reminderTime != null) {
-    _scheduleHabitNotification(habit); //  Programa la notificación para el nuevo hábito
-  }
-}
-
-void _editHabit(Habit oldHabit, Habit newHabit) {
-  setState(() {
-    final index = _habits.indexOf(oldHabit);
-    if (index != -1) {
-      _habits[index] = newHabit;
-    }
-  });
-  _saveHabits();
-  if (newHabit.reminderTime != oldHabit.reminderTime) {
-    NotificationService.cancelNotification(_habits.indexOf(oldHabit)); //  Cancela la anterior
-    if (newHabit.reminderTime != null) {
-      _scheduleHabitNotification(newHabit); //  Programa la nueva
-    }
-  }
-}
-
-void _deleteHabit(Habit habit) {
-  setState(() {
-    _habits.remove(habit);
-  });
-  _saveHabits();
-  NotificationService.cancelNotification(_habits.indexOf(habit)); //  Cancela la notificación
-}
-
-Future<void> _scheduleHabitNotification(Habit habit) async {
-  if (habit.reminderTime != null) {
-    final now = DateTime.now();
-    final scheduledTime = DateTime(
-      now.year,
-      now.month,
-      now.day,
-      habit.reminderTime!.hour,
-      habit.reminderTime!.minute,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(localizations!.translate('habits')), // Usa la traducción
+      ),
+      body: Column(
+        children: [
+          HabitCounter(count: _completedHabitsCount),
+          Expanded(
+            child: HabitList(
+              habits: _habits,
+              onHabitToggled: _toggleHabit,
+              onHabitEdited: _editHabit,
+              onHabitDeleted: _deleteHabit,
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (context) => AddHabitDialog(onHabitAdded: _addHabit),
+          );
+        },
+        child: Icon(Icons.add),
+      ),
     );
-    if (scheduledTime.isAfter(now)) {
-      await NotificationService.scheduleNotification(
-        id: _habits.indexOf(habit),
-        title: 'Recordatorio de Hábito',
-        body: '¡No olvides: ${habit.title}!',
-        scheduledDate: scheduledTime,
-      );
-    }
   }
+
+  // ... (Código anterior de la clase _HomeScreenState)
 }
